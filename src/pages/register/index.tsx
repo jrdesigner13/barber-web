@@ -1,17 +1,30 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import Head from "next/head"
 import { Button, Center, Flex, Input, Text } from "@chakra-ui/react"
 import Image from "next/image"
-
-import logoImg from '../../../public/images/logo.svg'
 import Link from "next/link"
 
+import { AuthContext } from "@/context/AuthContext"
+import logoImg from '../../../public/images/logo.svg'
+import { canSSRGuest } from "@/utils/canSSRGuest"
+
 export default function Register(){
+  const { signUp } = useContext(AuthContext);
   const [barber, setBarber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  function handleRegister(){}
+  async function handleRegister(){
+    if(barber === '' && email === '' && password === ''){
+      return;
+    }
+
+    await signUp({
+      name: barber,
+      email,
+      password
+    })
+  }
 
   return(
     <>
@@ -82,3 +95,9 @@ export default function Register(){
     </>
   )
 }
+
+export const getServerSideProps = canSSRGuest(async (ctx) => {
+  return{
+    props: {}
+  }
+})

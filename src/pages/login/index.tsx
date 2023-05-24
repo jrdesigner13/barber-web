@@ -6,6 +6,7 @@ import Image from "next/image"
 import logoImg from '../../../public/images/logo.svg'
 import Link from "next/link"
 import { AuthContext } from "@/context/AuthContext"
+import { canSSRGuest } from "@/utils/canSSRGuest"
 
 export default function Login(){
   const {signIn} = useContext(AuthContext);
@@ -13,6 +14,10 @@ export default function Login(){
   const [password, setPassword] = useState('');
 
   async function handleLogin() {
+    if(email === '' || password === ''){
+      return;
+    }
+
     await signIn({
       email,
       password
@@ -69,7 +74,7 @@ export default function Login(){
           </Button>
           <Center mt={2}>
             <Link href="/register">
-             <Text cursor="pointer">Don't have an account yet? <strong>Register</strong></Text>
+             <Text cursor="pointer">Don`&#39;`t have an account yet? <strong>Register</strong></Text>
             </Link>
           </Center>
         </Flex>
@@ -77,3 +82,9 @@ export default function Login(){
     </>
   )
 }
+
+export const getServerSideProps = canSSRGuest(async (ctx) => {
+  return{
+    props: {}
+  }
+})
