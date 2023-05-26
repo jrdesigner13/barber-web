@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useState } from "react";
-import { destroyCookie, setCookie } from "nookies";
+import { createContext, ReactNode, useState, useEffect } from "react";
+import { destroyCookie, setCookie, parseCookies } from "nookies";
 import Router from "next/router";
 
 import { api } from "@/services/apiClient";
@@ -109,6 +109,26 @@ export function AuthProvider({ children }: AuthProviderProps){
       console.log("error logout", err)
     }
   }
+
+  useEffect(() => {
+    const {'@barber.token': token} = parseCookies();
+
+    if(token){
+      api.get('/me').then(response => {
+        const { id, name, subscriptions, address, email } = response.data;
+        setUser({
+          id,
+          name,
+          email,
+          subscriptions,
+          address
+        })
+      })
+      .catch(() => {
+        signOut()
+      })
+    }
+  }, [])
 
   return(
     <AuthContext.Provider value={{ 
